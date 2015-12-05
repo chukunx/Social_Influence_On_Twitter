@@ -20,7 +20,7 @@ for seedId in seedUsers:
 	user = requestForUserInfo(client_0, seedId)
 
 	# Request for friends' id list.
-	user['friends_ids'] = requestForRelations(client_0, seedId,"frineds")
+	user['friends_ids'] = requestForRelations(client_0, seedId,"friends")
 
 	# Request for followers' id list.
 	user['followers_ids'] = requestForRelations(client_1, seedId,"followers")
@@ -42,7 +42,7 @@ for seedId in seedUsers:
 		cur.execute("CREATE TABLE friends(user_id TEXT, friends_id TEXT)")
 		cur.execute("CREATE TABLE followers(user_id TEXT, followers_id TEXT)")
 		
-		relationCount = {'followers':0,'friends':0}
+		relationCount = {'followers':0,'followersRemoved':0,'friends':0,'friendsRemoved':0}
 		
 		print "Loading user from TABLE users ... \n"
 		allIdsInUsers = 'SELECT user_id FROM users'
@@ -51,8 +51,8 @@ for seedId in seedUsers:
 
 		newId = user['id_str']
 		if(newId not in theDb):
-			insertNewUser(cur, user)
-			theDb
+			insertNewUser(cur, user).fetchall()
+			theDb.extend(newId)
 			count['countSeed'] += 1
 			count['countTotal'] += 1
 
@@ -63,20 +63,28 @@ for seedId in seedUsers:
 				cur.execute(insertFriend, parms)
 				if(friend not in theDb):
 					theFriend = requestForUserInfo(client_1, friend)
-					insertNewUser(cur,theFriend)
-					theDb
+					insertNewUser(cur,theFriend).fetchall()
+					theDb.extend(theFriend['id_str'])
+				else:
+					relationCount['friendsRemoved'] += 1
 				count['countTotal'] += 1
 				relationCount['friends'] += 1
-			print "\t%d frineds @%s have in total, %d friends inserted.\n" % (user['friends_count'], user['screen_name'], relationCount['friends'])
+			print "\t%d frineds @%s have in total, %d friends inserted. %d of friends have been removed.\n" % (user['friends_count'], user['screen_name'], relationCount['friends'], relationCount['friendsRemoved'])
 
 			print "Inserting %s's followers' id into TABLE followers ... \n" % seedId
 			for follower in user['followers_ids']:
 				insertFollower = 'INSERT INTO followers VALUES(?,?)'
 				parms = (newId, follower)
 				cur.execute(insertFollower, parms)
+				if(follower not in theDb):
+					theFollower = requestForUserInfo(client_1, follower)
+					insertNewUser(cur,theFollower).fetchall()
+					theDb.extend(theFollower['id_str'])
+				else:
+					relationCount['followersRemoved'] += 1
 				count['countTotal'] += 1
 				relationCount['followers'] += 1
-			print "\t%d followers @%s have in total, %d followers inserted.\n" % (user['followers_count'], user['screen_name'], relationCount['followers'])
+			print "\t%d followers @%s have in total, %d followers inserted.%d of followers have been removed.\n" % (user['followers_count'], user['screen_name'], relationCount['followers'], relationCount['followersRemoved'])
 
 			
 
@@ -139,12 +147,3 @@ def insertNewUser(cur, user):
 		flag = 1
 	parms = (user['id_str'], user['screen_name'], None, user['followers_count'], user['friends_count'], user['retweet_count'] ,user['favorite_count'], user['statuses_count'], flag, user['created_at'])
 	cur.execute(insertNewUser, parms)
-
-
-
-
-	
-
-
-
-
