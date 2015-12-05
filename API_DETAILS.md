@@ -28,6 +28,60 @@ We ask that you honor the rate limit. If you or your application abuses the rate
 2. Explain why you think your application was blacklisted.
 3. Describe in detail how you have fixed the problem that you think caused you to be blacklisted.
 
+### [Public API](https://dev.twitter.com/rest/public)
+
+#### [The Search API](https://dev.twitter.com/rest/public/search)
+
+The Twitter Search API is part of Twitter’s v1.1 REST API. It allows queries against the indices of recent or popular Tweets and behaves similarily to, but not exactly like the Search feature available in Twitter mobile or web clients, such as Twitter.com search.
+
+Before getting involved, it’s important to know that the Search API is focused on relevance and not completeness. This means that some Tweets and users may be missing from search results. If you want to match for completeness you should consider using a Streaming API instead.
+
+A detailed reference on this API endpoint can be found at [GET search/tweets](https://dev.twitter.com/rest/reference/get/search/tweets).
+
+#### [Rate Limits: Chart](https://dev.twitter.com/rest/public/rate-limits)
+
+#### [GET friends/ids](https://dev.twitter.com/rest/reference/get/friends/ids)
+
+Returns a cursored collection of user IDs for every user the specified user is following (otherwise known as their “friends”).
+
+At this time, results are ordered with the most recent following first — however, this ordering is subject to unannounced change and eventual consistency issues. Results are given in groups of 5,000 user IDs and multiple “pages” of results can be navigated through using the `next_cursor` value in subsequent requests. See [Using cursors to navigate collections](https://dev.twitter.com/overview/api/cursoring) for more information.
+
+This method is especially powerful when used in conjunction with [GET users / lookup](https://dev.twitter.com/rest/reference/get/users/lookup), a method that allows you to convert user IDs into full [user objects](https://dev.twitter.com/overview/api/users) in bulk.
+
+#### [GET followers/ids](https://dev.twitter.com/rest/reference/get/followers/ids)
+
+#### [GET friends/list](https://dev.twitter.com/rest/reference/get/friends/list)
+
+Returns a cursored collection of user objects for every user the specified user is following (otherwise known as their “friends”).
+
+#### [GET followers/list](https://dev.twitter.com/rest/reference/get/followers/list)
+
+#### [GET users/lookup](https://dev.twitter.com/rest/reference/get/users/lookup)
+
+Returns fully-hydrated user objects for up to 100 users per request, as specified by comma-separated values passed to the user_id and/or screen_name parameters.
+
+This method is especially useful when used in conjunction with collections of user IDs returned from [GET friends / ids](https://dev.twitter.com/rest/reference/get/friends/ids) and [GET followers / ids](https://dev.twitter.com/rest/reference/get/followers/ids).
+
+[GET users / show](https://dev.twitter.com/rest/reference/get/users/show) is used to retrieve a single user object.
+
+There are a few things to note when using this method.
+
+* You must be following a protected user to be able to see their most recent status update. If you don’t follow a protected user their status will be removed.
+* The order of user IDs or screen names may not match the order of users in the returned array.
+* If a requested user is unknown, suspended, or deleted, then that user will not be returned in the results list.
+* If none of your lookup criteria can be satisfied by returning a user object, a HTTP 404 will be thrown.
+* You are strongly encouraged to use a POST for larger requests.
+
+Returns a cursored collection of user IDs for every user following the specified user.
+
+#### [GET users/show](https://dev.twitter.com/rest/reference/get/users/show)
+
+Returns a [variety of information](https://dev.twitter.com/overview/api/users) about the user specified by the required  `user_id` or `screen_name` parameter. The author’s most recent Tweet will be returned inline when possible.
+
+[GET users / lookup](https://dev.twitter.com/rest/reference/get/users/lookup) is used to retrieve a bulk collection of user objects.
+
+You must be following a protected user to be able to see their most recent Tweet. If you don’t follow a protected user, the users Tweet will be removed. A Tweet will not always be returned in the `current_status` field.
+
 # [API Overview](https://dev.twitter.com/overview/api)
 
 ## [Object: User](https://dev.twitter.com/overview/api/users)
@@ -44,8 +98,10 @@ We ask that you honor the rate limit. If you or your application abuses the rate
 |`screen_name`     | `String`  | The screen name, handle, or alias that this user identifies themselves with. screen_names are unique but subject to change. Use id_str as a user identifier whenever possible. Typically a maximum of 15 characters long, but some historical accounts may exist with longer names.|
 |`status`          | [`Tweets`](https://dev.twitter.com/overview/api/tweets) | *Nullable*. If possible, the user’s most recent tweet or retweet. In some circumstances, this data cannot be provided and this field will be omitted, null, or empty. Perspectival attributes within tweets embedded within users cannot always be relied upon. [See Why are embedded objects stale or inaccurate?](https://dev.twitter.com/docs/faq/basics/why-are-embedded-objects-stale-or-inaccurate).|
 |`statuses_count`  | `Int`     | The number of tweets (including retweets) issued by the user.|
-|`time_zone`       | `String`  |             |
-|`utc_offset`      | `Int`     |             |
+|`default_profile_image`|`Boolean`|When true, indicates that the user has not uploaded their own avatar and a default egg avatar is used instead.|
+|`created_at`|`String`|The UTC datetime that the user account was created on Twitter.|
+|`time_zone`       | `String`  |*Nullable*. A string describing the Time Zone this user declares themselves within.|
+|`utc_offset`      | `Int`     |*Nullable*. The offset from GMT/UTC in seconds.|
 
 ## [Object: Twitter](https://dev.twitter.com/overview/api/tweets)
 
