@@ -1,3 +1,33 @@
+# Documentation
+
+## [REST APIs](https://dev.twitter.com/rest/public)
+
+The REST APIs provide programmatic access to read and write Twitter data. Author a new Tweet, read author profile and follower data, and more. The REST API identifies Twitter applications and users using OAuth; responses are available in JSON.
+
+### [API Rate Limits](https://dev.twitter.com/rest/public/rate-limiting)
+
+#### 15 Minute Windows
+
+Rate limits in version 1.1 of the API are divided into 15 minute intervals, which is a change from the 60 minute blocks in version 1.0. 
+
+While in version one of the API, an OAuth-enabled application could initiate 350 GET-based requests per hour per access token, API v1.1’s rate limiting model allows for a wider ranger of requests through per-method request limits. There are two initial buckets available for GET requests: 15 calls every 15 minutes, and 180 calls every 15 minutes. 
+
+#### GET and POST Request Limits
+
+Rate limits on “reads” from the system are defined on a per user and per application basis, while rate limits on writes into the system are defined solely at the user level. 
+
+Contrast this with write allowances, which are defined on a per user basis. So if user A ends up posting 5 Tweets with application Z, then for that same period, regardless of any other application that user A opens, those 5 POSTs will count against any other application acting on behalf of user A during that same window of time.
+
+Lastly, there may be times in which the rate limit values that we return are inconsistent, or cases where no headers are returned at all. Perhaps memcache has been reset, or one memcache was busy so the system spoke to a different instance: the values may be inconsistent now and again. We will make a best effort to maintain consistency, but we will err toward giving an application extra calls if there is an inconsistency.
+
+#### Blacklisting
+
+We ask that you honor the rate limit. If you or your application abuses the rate limits we will blacklist it. If you are blacklisted you will be unable to get a response from the Twitter API. If you or your application has been blacklisted and you think there has been an error you can contact the email address on our [Support](https://dev.twitter.com/docs/support) page. So we can get you back online quickly please include the following information:
+
+1. If you are using the REST API, make a call to the [GET application / rate_limit_status](https://dev.twitter.com/rest/reference/get/application/rate_limit_status) from the account or computer which you believe to be blacklisted.
+2. Explain why you think your application was blacklisted.
+3. Describe in detail how you have fixed the problem that you think caused you to be blacklisted.
+
 # [API Overview](https://dev.twitter.com/overview/api)
 
 ## [Object: User](https://dev.twitter.com/overview/api/users)
