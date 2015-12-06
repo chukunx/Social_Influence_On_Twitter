@@ -183,3 +183,4 @@ You must be following a protected user to be able to see their most recent Tweet
 1. [Twitter: Why the different types of retweet?](http://joelhughes.com/2013/02/23/twitter-types-of-retweet/)
 2. [Twitter for Websites](https://dev.twitter.com/web/overview) is a suite of embeddable widgets, buttons, and client-side scripting tools to integrate Twitter and display Tweets on your website or JavaScript application, including a single Tweet, multiple Tweets, Twitter Moments, Tweet Button, and the Follow Button.
 3. Twitter [Cards](https://dev.twitter.com/cards/overview) display additional content alongside a Tweet for supported links. Highlight a photo, video, or other page summary when your links are shared on Twitter to drive additional traffic to your website, iOS, or Android app. 
+4. [Klout API](https://klout.com/s/developers/v2)

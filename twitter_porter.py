@@ -98,18 +98,19 @@ directoryForDB = directoryForDB + "twitter.db"
 con = lite.connect(directoryForDB)
 with con:
 	cur = con.cursor()
-	cur.execute("DROP TABLE IF EXISTS users") 
-	cur.execute("DROP TABLE IF EXISTS friends") 
-	cur.execute("DROP TABLE IF EXISTS followers")
-	cur.execute("CREATE TABLE users(user_id TEXT, screen_name TEXT, klout_score NUMERIC, followers_count INTEGER, friends_count INTEGER, retweet_count NUMERIC, favorite_count NUMERIC, statuses_count INTEGER, default_profile_image INTEGER, user_created_at TEXT)")
-	cur.execute("CREATE TABLE friends(user_id TEXT, friends_id TEXT)")
-	cur.execute("CREATE TABLE followers(user_id TEXT, followers_id TEXT)")
-	con.commit()
-	
+	# cur.execute("DROP TABLE IF EXISTS users") 
+	# cur.execute("DROP TABLE IF EXISTS friends") 
+	# cur.execute("DROP TABLE IF EXISTS followers")
+	# cur.execute("CREATE TABLE users(user_id TEXT, screen_name TEXT, klout_score NUMERIC, followers_count INTEGER, friends_count INTEGER, retweet_count NUMERIC, favorite_count NUMERIC, statuses_count INTEGER, default_profile_image INTEGER, user_created_at TEXT)")
+	# cur.execute("CREATE TABLE friends(user_id TEXT, friends_id TEXT)")
+	# cur.execute("CREATE TABLE followers(user_id TEXT, followers_id TEXT)")
+	# con.commit()
+
 	# [console](https://dev.twitter.com/rest/tools/console)
-	# seedUsers = {'1746891':'ninaksimon','59268383','STurkle'}
-	seedUsers = {'1143566300':'aolivex','37505751':'MakaylaAWray','16220555':'ElizabethMay'}
+	seedUsers = {'633660653':'JazmeenStyle'}
+	# seedUsers = {'1143566300':'aolivex','37505751':'MakaylaAWray','1018277820':'Fotofilmic'}
 	# seedUsers = {'328860549':'makili1949','2981527257':'TraceyWCDC','3538939877':'ashplantus'}
+
 	count = {'countSeed':0, 'countTotal':0}
 	
 	for seedId in seedUsers:
