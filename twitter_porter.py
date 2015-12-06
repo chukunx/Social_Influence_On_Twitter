@@ -6,23 +6,7 @@ import urllib
 import os
 
 ############################## Authentication ##############################
-# hello World_TestAPIs
-consumer_key='a7x31oeyS9HAofEoQALkUmgak'
-consumer_secret='IsodAjbQ57SD3PtzWuVgP6v0NLQr1sAHjRtK2ZGqUuVxfEbgAm'
-access_token_key='3435196294-E32sIJL0VY0IkIFJRLQPIwBICSh8r23vtPlQGXB'
-access_token_secret='f9ep9P21ODCcvKkuVLKljWWJchl0ktwbfOvh1SwVcSHUm'
-consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
-token = oauth.Token(key=access_token_key, secret=access_token_secret)
-client_0 = oauth.Client(consumer, token)
 
-# DA_Lab
-consumer_key='N0MRF9eXROLSweHM8EvTEqd9k'
-consumer_secret='xMfG9tLbBXXc0KmCU4JLY2n23s6He2tTdEbt4BHVGVUfUKTVlz'
-access_token_key='3435196294-Itqk6YQ36TPBqHKrwyaCEK2hJAX1A4IF4Qn5XrM'
-access_token_secret='iocc3LEf4CmzCdnjAirkENbeFmowTabMD3KZ6GpghDxKB'
-consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
-token = oauth.Token(key=access_token_key, secret=access_token_secret)
-client_1 = oauth.Client(consumer, token)
 ############################## Authentication ##############################
 
 # Request for user information from twitter.
@@ -101,9 +85,6 @@ def waitToCross(seconds, start):
 		overlap = time.time()-start
 	return time.time()
 
-# [console](https://dev.twitter.com/rest/tools/console)
-# seedUsers = {'1746891':'ninaksimon','59268383','STurkle'}
-
 # time controler
 timeUserInfor = time.time()
 timeRelation = timeUserInfor
@@ -124,22 +105,37 @@ with con:
 	cur.execute("CREATE TABLE friends(user_id TEXT, friends_id TEXT)")
 	cur.execute("CREATE TABLE followers(user_id TEXT, followers_id TEXT)")
 	con.commit()
-
-	seedUsers = {'1143566300':'aolivex'}
+	
+	# [console](https://dev.twitter.com/rest/tools/console)
+	# seedUsers = {'1746891':'ninaksimon','59268383','STurkle'}
+	seedUsers = {'1143566300':'aolivex','37505751':'MakaylaAWray','16220555':'ElizabethMay'}
+	# seedUsers = {'328860549':'makili1949','2981527257':'TraceyWCDC','3538939877':'ashplantus'}
 	count = {'countSeed':0, 'countTotal':0}
 	
 	for seedId in seedUsers:
 		# Request for seed user's information.
-		timeUserInfor = waitToCross(5,timeUserInfor)
-		user = requestForUserInfo(client_0, seedId)
+		timeUserInfor = waitToCross(5,timeUserInfor) ######################################
+		try:
+			user = requestForUserInfo(client_0, seedId)
+		except Exception, e:
+			print " !!!!! Exception !!!!!! "
+			continue
 	
 		# Request for friends' id list.
-		timeRelation = waitToCross(60,timeRelation)
-		user['friends_ids'] = requestForRelations(client_0, seedId, "friends")
-	
+		timeRelation = waitToCross(60,timeRelation) ######################################
+		try:
+			user['friends_ids'] = requestForRelations(client_0, seedId, "friends")
+		except Exception, e:
+			print " !!!!! Exception !!!!!! "
+			continue
+
 		# Request for followers' id list.
-		timeRelation = waitToCross(60,timeRelation)
-		user['followers_ids'] = requestForRelations(client_1, seedId, "followers")
+		timeRelation = waitToCross(60,timeRelation) ######################################
+		try:
+			user['followers_ids'] = requestForRelations(client_1, seedId, "followers")
+		except Exception, e:
+			print " !!!!! Exception !!!!!! "
+			continue	
 		print ""
 	
 		relationCount = {'followers':0,'followersRemoved':0,'friends':0,'friendsRemoved':0}
@@ -148,45 +144,61 @@ with con:
 		allIdsInUsers = 'SELECT user_id FROM users'
 		theDb = cur.execute(allIdsInUsers).fetchall()
 		print " * %d users in total." % len(theDb)
-
 		newId = user['id_str']
-		if(newId not in theDb):
+		newIdTuple = tuple((user['id_str'].decode('unicode-escape'),))
+		if(newIdTuple not in theDb):	
 			insertNewUser(con, user)
-			theDb.extend(newId)
+			theDb.extend(newIdTuple)
 			count['countSeed'] += 1
 			count['countTotal'] += 1
+		else:
+			print " * Seed %s omitted." % newId
 
-			print " * %s: Inserting friends into TABLE(friends) ... " % seedId
-			for friend in user['friends_ids']:
-				insertFriend = 'INSERT INTO friends VALUES(?,?)'
-				parms = (newId, friend)
-				cur.execute(insertFriend, parms)
-				con.commit()
-				if(friend not in theDb):
-					timeUserInfor = waitToCross(5,timeUserInfor)
+		print " * %s: Inserting friends into TABLE(friends) ... " % seedId
+		for friend in user['friends_ids']:
+			insertFriend = 'INSERT INTO friends VALUES(?,?)'
+			parms = (newId, friend)
+			cur.execute(insertFriend, parms)
+			con.commit()
+			friendTuple = tuple((friend.decode('unicode-escape'),))
+			if(friendTuple not in theDb):
+				timeUserInfor = waitToCross(5,timeUserInfor) ######################################
+				try:
 					theFriend = requestForUserInfo(client_1, friend)
-					insertNewUser(con,theFriend)
-					theDb.extend(theFriend['id_str'])
-				else:
-					relationCount['friendsRemoved'] += 1
-				count['countTotal'] += 1
-				relationCount['friends'] += 1
-			print " * %d frineds @%s have in total, %d friends inserted. %d of friends have been removed." % (user['friends_count'], user['screen_name'], relationCount['friends'], relationCount['friendsRemoved'])
-
-			print " * %s: Inserting followers into TABLE(followers) ... " % seedId
-			for follower in user['followers_ids']:
-				insertFollower = 'INSERT INTO followers VALUES(?,?)'
-				parms = (newId, follower)
-				cur.execute(insertFollower, parms)
-				if(follower not in theDb):
-					timeUserInfor = waitToCross(5,timeUserInfor)
+				except Exception, e:
+					print " !!!!! Exception !!!!!! "
+					continue
+				insertNewUser(con,theFriend)
+				theDb.extend(friendTuple)
+			else:
+				relationCount['friendsRemoved'] += 1
+				print " * Friend %s omitted." % friend
+			count['countTotal'] += 1
+			relationCount['friends'] += 1
+		print "\n###########################################################################################"
+		print "%d frineds @%s have in total, %d friends inserted. %d of friends have been removed." % (user['friends_count'], user['screen_name'], relationCount['friends'], relationCount['friendsRemoved'])
+		
+		print " * %s: Inserting followers into TABLE(followers) ... " % seedId
+		for follower in user['followers_ids']:
+			insertFollower = 'INSERT INTO followers VALUES(?,?)'
+			parms = (newId, follower)
+			cur.execute(insertFollower, parms)
+			followerTuple = tuple((follower.decode('unicode-escape'),))
+			if(followerTuple not in theDb):
+				timeUserInfor = waitToCross(5,timeUserInfor) ######################################
+				try:
 					theFollower = requestForUserInfo(client_0, follower)
-					insertNewUser(con,theFollower)
-					theDb.extend(theFollower['id_str'])
-				else:
-					relationCount['followersRemoved'] += 1
-				count['countTotal'] += 1
-				relationCount['followers'] += 1
-			print " * %d followers @%s have in total, %d followers inserted.%d of followers have been removed." % (user['followers_count'], user['screen_name'], relationCount['followers'], relationCount['followersRemoved'])
+				except Exception, e:
+					print " !!!!! Exception !!!!!! "
+					continue
+				insertNewUser(con,theFollower)
+				theDb.extend(followerTuple)
+			else:
+				relationCount['followersRemoved'] += 1
+				print " * Follower %s omitted." % follower
+			count['countTotal'] += 1
+			relationCount['followers'] += 1
+		print "\n###########################################################################################"
+		print "%d followers @%s have in total, %d followers inserted.%d of followers have been removed." % (user['followers_count'], user['screen_name'], relationCount['followers'], relationCount['followersRemoved'])
 con.close()
 	
