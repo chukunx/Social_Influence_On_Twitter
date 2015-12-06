@@ -1,11 +1,28 @@
 import oauth2 as oauth
 import sqlite3 as lite
 import simplejson as json
+import time 
 import urllib
 import os
 
 ############################## Authentication ##############################
+# hello World_TestAPIs
+consumer_key='a7x31oeyS9HAofEoQALkUmgak'
+consumer_secret='IsodAjbQ57SD3PtzWuVgP6v0NLQr1sAHjRtK2ZGqUuVxfEbgAm'
+access_token_key='3435196294-E32sIJL0VY0IkIFJRLQPIwBICSh8r23vtPlQGXB'
+access_token_secret='f9ep9P21ODCcvKkuVLKljWWJchl0ktwbfOvh1SwVcSHUm'
+consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
+token = oauth.Token(key=access_token_key, secret=access_token_secret)
+client_0 = oauth.Client(consumer, token)
 
+# DA_Lab
+consumer_key='N0MRF9eXROLSweHM8EvTEqd9k'
+consumer_secret='xMfG9tLbBXXc0KmCU4JLY2n23s6He2tTdEbt4BHVGVUfUKTVlz'
+access_token_key='3435196294-Itqk6YQ36TPBqHKrwyaCEK2hJAX1A4IF4Qn5XrM'
+access_token_secret='iocc3LEf4CmzCdnjAirkENbeFmowTabMD3KZ6GpghDxKB'
+consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
+token = oauth.Token(key=access_token_key, secret=access_token_secret)
+client_1 = oauth.Client(consumer, token)
 ############################## Authentication ##############################
 
 # Request for user information from twitter.
@@ -76,8 +93,20 @@ def insertNewUser(con, user):
 	cur.execute(insertNewUser, parms)
 	con.commit()
 
+def waitToCross(seconds, start):
+	print "API Limitation: Wait for %d seconds." % seconds
+	overlap = time.time()-start
+	count = 0;
+	while(overlap < seconds):
+		overlap = time.time()-start
+	return time.time()
+
 # [console](https://dev.twitter.com/rest/tools/console)
 # seedUsers = {'1746891':'ninaksimon','59268383','STurkle'}
+
+# time controler
+timeUserInfor = time.time()
+timeRelation = timeUserInfor
 
 # Create tables.
 directoryForDB = "./data/"
@@ -91,7 +120,7 @@ with con:
 	cur.execute("DROP TABLE IF EXISTS users") 
 	cur.execute("DROP TABLE IF EXISTS friends") 
 	cur.execute("DROP TABLE IF EXISTS followers")
-	cur.execute("CREATE TABLE users(user_id TEXT, screen_name TEXT, klout_score INTEGER, followers_count INTEGER, friends_count INTEGER, retweet_count NUMERIC, favorite_count NUMERIC, statuses_count INTEGER, default_profile_image INTEGER, user_created_at TEXT)")
+	cur.execute("CREATE TABLE users(user_id TEXT, screen_name TEXT, klout_score NUMERIC, followers_count INTEGER, friends_count INTEGER, retweet_count NUMERIC, favorite_count NUMERIC, statuses_count INTEGER, default_profile_image INTEGER, user_created_at TEXT)")
 	cur.execute("CREATE TABLE friends(user_id TEXT, friends_id TEXT)")
 	cur.execute("CREATE TABLE followers(user_id TEXT, followers_id TEXT)")
 	con.commit()
@@ -101,12 +130,15 @@ with con:
 	
 	for seedId in seedUsers:
 		# Request for seed user's information.
+		timeUserInfor = waitToCross(5,timeUserInfor)
 		user = requestForUserInfo(client_0, seedId)
 	
 		# Request for friends' id list.
+		timeRelation = waitToCross(60,timeRelation)
 		user['friends_ids'] = requestForRelations(client_0, seedId, "friends")
 	
 		# Request for followers' id list.
+		timeRelation = waitToCross(60,timeRelation)
 		user['followers_ids'] = requestForRelations(client_1, seedId, "followers")
 		print ""
 	
@@ -131,6 +163,7 @@ with con:
 				cur.execute(insertFriend, parms)
 				con.commit()
 				if(friend not in theDb):
+					timeUserInfor = waitToCross(5,timeUserInfor)
 					theFriend = requestForUserInfo(client_1, friend)
 					insertNewUser(con,theFriend)
 					theDb.extend(theFriend['id_str'])
@@ -146,6 +179,7 @@ with con:
 				parms = (newId, follower)
 				cur.execute(insertFollower, parms)
 				if(follower not in theDb):
+					timeUserInfor = waitToCross(5,timeUserInfor)
 					theFollower = requestForUserInfo(client_0, follower)
 					insertNewUser(con,theFollower)
 					theDb.extend(theFollower['id_str'])
