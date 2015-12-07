@@ -107,7 +107,9 @@ with con:
 	# con.commit()
 
 	# [console](https://dev.twitter.com/rest/tools/console)
-	seedUsers = {'633660653':'JazmeenStyle'}
+	seedUsers = {'2918105739':'romina_vairo'}
+	# seedUsers = {'1976274715':'GaptoofChoo'}
+	# seedUsers = {'633660653':'JazmeenStyle'}
 	# seedUsers = {'1143566300':'aolivex','37505751':'MakaylaAWray','1018277820':'Fotofilmic'}
 	# seedUsers = {'328860549':'makili1949','2981527257':'TraceyWCDC','3538939877':'ashplantus'}
 
@@ -119,7 +121,7 @@ with con:
 		try:
 			user = requestForUserInfo(client_0, seedId)
 		except Exception, e:
-			print " !!!!! Exception !!!!!! "
+			print " !!!!! User Protected !!!!!! "
 			continue
 	
 		# Request for friends' id list.
@@ -127,7 +129,7 @@ with con:
 		try:
 			user['friends_ids'] = requestForRelations(client_0, seedId, "friends")
 		except Exception, e:
-			print " !!!!! Exception !!!!!! "
+			print " !!!!! User Protected !!!!!! "
 			continue
 
 		# Request for followers' id list.
@@ -135,7 +137,7 @@ with con:
 		try:
 			user['followers_ids'] = requestForRelations(client_1, seedId, "followers")
 		except Exception, e:
-			print " !!!!! Exception !!!!!! "
+			print " !!!!! User Protected !!!!!! "
 			continue	
 		print ""
 	
@@ -167,7 +169,7 @@ with con:
 				try:
 					theFriend = requestForUserInfo(client_1, friend)
 				except Exception, e:
-					print " !!!!! Exception !!!!!! "
+					print " !!!!! User Protected !!!!!! "
 					continue
 				insertNewUser(con,theFriend)
 				theDb.extend(friendTuple)
@@ -190,7 +192,7 @@ with con:
 				try:
 					theFollower = requestForUserInfo(client_0, follower)
 				except Exception, e:
-					print " !!!!! Exception !!!!!! "
+					print " !!!!! User Protected !!!!!! "
 					continue
 				insertNewUser(con,theFollower)
 				theDb.extend(followerTuple)
